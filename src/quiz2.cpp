@@ -43,6 +43,20 @@ Matrix get_matrix(string name){
   return(m1);
 }
 
+Vector matrix_to_vector(Matrix m){
+  int row = m.row_size();
+  int column = m.column_size();
+
+  Vector v(row*column);
+
+  for(int i=1;i<=row;i++){
+    for(int j=1;j<=column;j++){
+      v.set((i-1)*32+j-1, m[i][j]/255);
+    }
+  }
+  return(v);
+}
+
 
 int main(){
   int length = 154;
@@ -54,12 +68,15 @@ int main(){
   }
 
   // ファイルの名前リストに対応するデータを取ってきて、Matrix型として格納する。
-  Matrix m_list[length];
-  for(int i=0; i<length; i++){
-    m_list[i] = get_matrix(name_list[i]);
+  // Matrix m_list[length];
+  // Vector v_list[length](1024);  // ここがわからない
+  for(int i=0; i<2; i++){
+    //m_list[i] = get_matrix(name_list[i]);
+    // v_list[i] = matrix_to_vector(get_matrix(name_list[i]));
+    matrix_to_vector(get_matrix(name_list[i])).print();
   }
 
   // debug
-  m_list[0].print();
+  // v_list[0].print();
 
 }
