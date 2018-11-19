@@ -14,10 +14,8 @@ using namespace std;
 #include "matrix.cpp"
 
 Matrix get_matrix(string name){
-  using namespace std;
   ifstream stream(name);
   string line;
-  int data[32][32];
   const string delim = " ";
 
   int row = 0;
@@ -33,8 +31,8 @@ Matrix get_matrix(string name){
       for ( string::size_type spos, epos = 0;
           (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
             string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-            m1[row][col++] = stoi(token);
-            data[row][col] = stoi(token);
+            m1[row+1][col+1] = stoi(token);
+            col++;
           }
       ++row;
     }
@@ -42,6 +40,7 @@ Matrix get_matrix(string name){
   }
   return(m1);
 }
+
 
 Vector matrix_to_vector(Matrix m){
   int row = m.row_size();
@@ -58,25 +57,135 @@ Vector matrix_to_vector(Matrix m){
 }
 
 
+Vector get_labels(){
+  ifstream stream("./labels.txt");
+  string line;
+  const string delim = "\n";
+
+  Vector labels(154);
+  int col = 0;
+  while ( getline(stream, line) ) {
+    labels.set(col,stoi(line.c_str()));
+    col++;
+  }
+  return labels;
+}
+
+std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
+  ifstream stream("./param.txt");
+  string line;
+  const string delim = " ";
+
+  Matrix W1(256,1024);
+  Matrix W2(256,256);
+  Matrix W3(23,256);
+
+  Vector b1(256);
+  Vector b2(256);
+  Vector b3(23);
+
+  int row = 0;
+  int col;
+
+  while ( getline(stream, line) ) {
+    // W1に格納
+    if(row <= 255){
+      col = 0;
+      for ( string::size_type spos, epos = 0;
+          (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
+            string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
+            W1[row+1][col+1] = stod(token);
+            col++;
+          }
+    // b1に格納
+    }else if(row == 256){
+      col = 0;
+      for ( string::size_type spos, epos = 0;
+          (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
+            string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
+            b1.set(col,stod(token));
+            col++;
+          }
+    // W2に格納
+    }else if(row <= 512){
+      col = 0;
+      for ( string::size_type spos, epos = 0;
+          (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
+            string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
+            W2[row-256][col+1] = stod(token);
+            col++;
+          }
+    // b2に格納
+    }else if(row == 513){
+      col = 0;
+      for ( string::size_type spos, epos = 0;
+          (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
+            string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
+            b2.set(col,stod(token));
+            col++;
+          }
+    // W3に格納
+    }else if(row <= 536){
+      col = 0;
+      for ( string::size_type spos, epos = 0;
+          (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
+            string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
+            W3[row-513][col+1] = stod(token);
+            col++;
+          }
+    // b3に格納
+    }else if(row == 537){
+          col = 0;
+          for ( string::size_type spos, epos = 0;
+              (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
+                string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
+                b3.set(col,stod(token));
+                col++;
+          }
+    }
+    ++row;
+  }
+  return std::forward_as_tuple(W1,W2,W3,b1,b2,b3);
+}
+
+
 int main(){
+  cout << "==================start==================" << endl;
+
+  // パラメータ取得
+  Matrix W1,W2,W3;
+  Vector b1(256),b2(256),b3(23);
+  tie(W1,W2,W3,b1,b2,b3) = get_params();
+
+  // ラベル取得
+  Vector labels(154);
+  labels = get_labels();
+
+  // ファイル名作成
   int length = 154;
   string name_list[length];
-
-  // ファイルの名前を作成。
   for(int i=0; i<length; i++){
     name_list[i] = "./pgm/" + to_string(i+1) + ".pgm";
   }
+  cout << "  file name    " << "pred\t" << "ans\t" << "T/F" << endl;
+  cout << "---------------------------------------" << endl;
+  // ファイル名リストの中にあるデータを加工。
+  int num_correct = 0;
+  for(int i=0; i<length; i++){
+    Vector x(1024), h1(256), h2(256), y(23);
+    x = matrix_to_vector(get_matrix(name_list[i]));
+    h1 = ReLU(W1*x + b1);
+    h2 = ReLU(W2*h1 + b2);
+    y = Softmax(W3*h2 + b3);
+    int label = labels.get(i);
+    int pred = y.argmax()+1;
 
-  // ファイルの名前リストに対応するデータを取ってきて、Matrix型として格納する。
-  // Matrix m_list[length];
-  // Vector v_list[length](1024);  // ここがわからない
-  for(int i=0; i<2; i++){
-    //m_list[i] = get_matrix(name_list[i]);
-    // v_list[i] = matrix_to_vector(get_matrix(name_list[i]));
-    matrix_to_vector(get_matrix(name_list[i])).print();
+    cout << name_list[i] << ": \t" << pred << "\t" << label << "\t" << (pred==label) << endl;
+    if(pred==label) num_correct++;
   }
+  cout << "=======================================" << endl;
 
-  // debug
-  // v_list[0].print();
+  cout << "accuracy = " << num_correct/1.54 << "%" <<  endl;
 
+  cout << "==================end==================" << endl;
 }

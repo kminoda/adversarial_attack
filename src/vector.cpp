@@ -27,6 +27,8 @@ class Vector{
 
     void print();
 
+    int argmax();
+
     // なんかこれも使われてないっぽい。。。なんだろう
     Vector& operator=(const Vector& v);
 };
@@ -75,13 +77,22 @@ void Vector::print(void) {
   printf("]\n");
 }
 
+int Vector::argmax(void){
+  int argmax = 0;
+  for(int i=0; i<length; i++){
+    if(value[argmax]<value[i]){
+      argmax = i;
+    }
+  }
+  return argmax;
+}
+
   // なんかこれも使われてないっぽい。。。なんだろう
 Vector& Vector::operator=(const Vector& v){
   delete[] value;
   length = v.length;
   value = new double[length];
   memcpy(value,v.value,length*sizeof(double));
-  printf("ここだよ〜\n");
   return *this;
 }
 
@@ -97,14 +108,7 @@ Vector ReLU(Vector v1){
 }
 
 double exp(double x){
-  int n_max = 10;
-  double temp = 1.0;
-  double r = temp;
-  for(int i=1; i<n_max; i++){
-    temp *= x/i;
-    r += temp;
-  }
-  return(r);
+  return pow(2.71828182846,x);
 }
 
 Vector Softmax(Vector v1){
