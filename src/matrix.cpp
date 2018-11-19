@@ -48,11 +48,11 @@ Matrix::Matrix(int i,int j)
 
   p_top = new double*[row+1];
   *p_top = new double[row*column+1];
-  for(int k=1;k<=row;k++){
-    *(p_top+k) = *p_top + ((k-1)*column);
+  for(int k=0;k<row;k++){
+    *(p_top+k) = *p_top + (k*column);
   }
-  for(int k1=1;k1<=row;k1++){
-    for(int k2=1;k2<=column;k2++){
+  for(int k1=0;k1<row;k1++){
+    for(int k2=0;k2<column;k2++){
       p_top[k1][k2] = 0;
     }
   }
@@ -65,12 +65,12 @@ Matrix::Matrix(const Matrix &cp){
 
   p_top = new double*[row+1];
   *p_top = new double[row*column+1];
-  for(int k=1; k<=row; k++){
-    *(p_top+k) = *p_top + ((k-1)*column);
+  for(int k=0; k<row; k++){
+    *(p_top+k) = *p_top + (k*column);
   }
 
-  for(int k1=1; k1<=row; k1++){
-    for(int k2=1; k2<column; k2++){
+  for(int k1=0; k1<row; k1++){
+    for(int k2=0; k2<column; k2++){
       p_top[k1][k2] = cp.p_top[k1][k2];
     }
   }
@@ -96,12 +96,12 @@ void Matrix::change_size(int i,int j){
   p_top = new double*[row+1];
   *p_top = new double[row*column+1];
 
-  for(int k=1; k<=row; k++){
-    *(p_top+k) = *p_top + ((k-1)*column);
+  for(int k=0; k<row; k++){
+    *(p_top+k) = *p_top + (k*column);
   }
 
-  for(int k1=1; k1<=row; k1++){
-    for(int k2=1; k2<=column; k2++){
+  for(int k1=0; k1<row; k1++){
+    for(int k2=0; k2<column; k2++){
       p_top[k1][k2] = 0;
     }
   }
@@ -110,10 +110,10 @@ void Matrix::change_size(int i,int j){
 
 void Matrix::print(){
   printf("[");
-  for(int i=1; i<=row; i++){
-    if(i!=1){printf("\n");}
+  for(int i=0; i<row; i++){
+    if(i!=0){printf("\n");}
     printf("[");
-    for(int j=1; j<=column; j++){
+    for(int j=0; j<column; j++){
       printf("%f",p_top[i][j]);
       printf(" ");
     }
@@ -127,8 +127,8 @@ Matrix Matrix::operator=(const Matrix &a){
     change_size(a.row,a.column);
   }
 
-  for(int i=1; i<=row; i++){
-    for(int j=1; j<=column; j++){
+  for(int i=0; i<row; i++){
+    for(int j=0; j<column; j++){
       p_top[i][j] = a.p_top[i][j];
     }
   }
@@ -144,8 +144,8 @@ Matrix Matrix::operator+(const Matrix &a){
     exit(0);
   }
   Matrix r(row,column);
-  for(int i=1; i<=row; i++){
-    for(int j=1; j<=column; j++){
+  for(int i=0; i<row; i++){
+    for(int j=0; j<column; j++){
       r.p_top[i][j] = p_top[i][j] + a.p_top[i][j];
     }
   }
@@ -159,8 +159,8 @@ Matrix Matrix::operator-(const Matrix &a){
   }
 
   Matrix r(row,column);
-  for(int i=1; i<=row; i++){
-    for(int j=1; j<=column; j++){
+  for(int i=0; i<row; i++){
+    for(int j=0; j<column; j++){
       r.p_top[i][j] = p_top[i][j] - a.p_top[i][j];
     }
   }
@@ -176,9 +176,9 @@ Matrix Matrix::operator*(const Matrix &a){
   }
 
   Matrix r(row, a.column);
-  for(int i=1;i<=row; i++){
-    for(int j=1;j<a.column; j++){
-      for(int k=1; k<column; k++){
+  for(int i=0;i<row; i++){
+    for(int j=0;j<a.column; j++){
+      for(int k=0; k<column; k++){
         r.p_top[i][j] += p_top[i][k] * a.p_top[k][j];
       }
     }
@@ -190,8 +190,8 @@ Matrix Matrix::operator*(const Matrix &a){
 Matrix operator*(const Matrix &a, double b)
 {
   Matrix r(a.row, a.column);
-  for(int i=1; i<=a.row; i++){
-    for(int j=1; j<=a.column; j++){
+  for(int i=0; i<a.row; i++){
+    for(int j=0; j<a.column; j++){
       r[i][j] = b * a.p_top[i][j];
     }
   }
@@ -201,8 +201,8 @@ Matrix operator*(const Matrix &a, double b)
 Matrix operator*(double b, const Matrix &a)
 {
   Matrix r(a.row, a.column);
-  for(int i=1; i<=a.row; i++){
-    for(int j=1; j<=a.column; j++){
+  for(int i=0; i<a.row; i++){
+    for(int j=0; j<a.column; j++){
       r[i][j] = b * a.p_top[i][j];
     }
   }
@@ -217,9 +217,9 @@ Vector operator*(const Matrix &a, Vector b)
     exit(0);
   }
   Vector r(a.row);
-  for(int i=1; i<=a.row; i++){
-    for(int j=1; j<=a.column; j++){
-      r.set(i-1, r.get(i-1) + a.p_top[i][j] * b.get(j-1));
+  for(int i=0; i<a.row; i++){
+    for(int j=0; j<a.column; j++){
+      r[i] =  r[i] + a.p_top[i][j] * b[j];
     }
   }
   return(r);
@@ -236,8 +236,8 @@ void Matrix::unit_matrix()
 
   int n = row;
   double** a = p_top;
-  for(int i=1; i<=n; i++){
-    for(int j=1; j<=n; j++){
+  for(int i=0; i<n; i++){
+    for(int j=0; j<n; j++){
       a[i][j] = 0;
       if(i == j) a[i][j] = 1;
     }
@@ -250,17 +250,10 @@ Matrix Matrix::transpose()
   Matrix t(column, row);
   double** a = p_top;
 
-  for(int i=1; i<=row; i++){
-    for(int j=1; j<=column; j++){
+  for(int i=0; i<row; i++){
+    for(int j=0; j<column; j++){
       t[j][i] = a[i][j];
     }
   }
   return(t);
 }
-
-/*
-int main(void){
-  Matrix a(3,3);
-  a.unit_matrix();
-  a.print();
-}*/

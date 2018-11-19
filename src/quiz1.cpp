@@ -14,7 +14,7 @@ int main(void){
   // ベクトル1の定義
   Vector v1(3);
   for(int i=0;i<3;i++){
-    v1.set(i,i+2);
+    v1[i] = i+2;
   }
   printf("\n========== Vector1 ==========\n");
   v1.print();
@@ -23,7 +23,7 @@ int main(void){
   // ベクトル2の定義
   Vector v2(3);
   for(int i=0;i<3;i++){
-    v2.set(i,2*i-1);
+    v2[i]  = 2*i-1;
   }
   printf("\n========== Vector2 ==========\n");
   v2.print();

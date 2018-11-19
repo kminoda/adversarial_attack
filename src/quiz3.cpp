@@ -51,7 +51,7 @@ int main(){
 
   for(int i=0; i<length; i++){
     // 正解ラベルとともに出力。正解していたらカウントを増やす。
-    label = labels.get(i);
+    label = labels[i];
 
     // パラメータを用いてラベル予測
     // Vector x(1024),a1(256), h1(256), a2(256), h2(256), fx(23);
@@ -64,7 +64,7 @@ int main(){
     pred_1 = fx.argmax()+1;
 
     // FGSMによる擾乱を加えてラベル予測
-    minus_dt.set(labels.get(i),-1.0);
+    minus_dt[labels[i]] = -1.0;
     NyL = fx + minus_dt;
     Nh2L = W3.transpose() * NyL;
     Na2L = Backward(Nh2L,a2);
@@ -72,9 +72,7 @@ int main(){
     Na1L = Backward(Nh1L,a1);
     NxL = W1.transpose() * Na1L;
     signNxL = sign(NxL);
-    for(int j=0;j<1024;j++){
-      eps_FGSM.set(j, signNxL.get(j) * eps_0);
-    }
+    eps_FGSM = signNxL * eps_0;
     x_tilde = x + eps_FGSM;
 
     a1 = W1*x_tilde + b1;
@@ -89,7 +87,7 @@ int main(){
     std::mt19937 mt(rd());
     std::uniform_real_distribution<double> score(-1.0,1.0);
     for(int i=0; i<1024; ++i){
-      eps_random.set(i,score(mt)*eps_0);
+      eps_random[i] = score(mt)*eps_0;
     }
     x_random = x + eps_random;
     a1 = W1*x_random + b1;

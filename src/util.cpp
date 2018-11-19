@@ -31,7 +31,7 @@ Matrix get_matrix(string name){
       for ( string::size_type spos, epos = 0;
           (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
             string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-            m1[row+1][col+1] = stoi(token);
+            m1[row][col] = stoi(token);
             col++;
           }
       ++row;
@@ -48,9 +48,9 @@ Vector matrix_to_vector(Matrix m){
 
   Vector v(row*column);
 
-  for(int i=1;i<=row;i++){
-    for(int j=1;j<=column;j++){
-      v.set((i-1)*32+j-1, m[i][j]/255);
+  for(int i=0;i<row;i++){
+    for(int j=0;j<column;j++){
+      v[i*32+j] = m[i][j]/255;
     }
   }
   return(v);
@@ -65,7 +65,7 @@ Vector get_labels(){
   Vector labels(154);
   int col = 0;
   while ( getline(stream, line) ) {
-    labels.set(col,stoi(line.c_str()));
+    labels[col] = stoi(line.c_str());
     col++;
   }
   return labels;
@@ -94,7 +94,7 @@ std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
       for ( string::size_type spos, epos = 0;
           (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
             string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-            W1[row+1][col+1] = stod(token);
+            W1[row][col] = stod(token);
             col++;
           }
     // b1に格納
@@ -103,7 +103,7 @@ std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
       for ( string::size_type spos, epos = 0;
           (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
             string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-            b1.set(col,stod(token));
+            b1[col] = stod(token);
             col++;
           }
     // W2に格納
@@ -112,7 +112,7 @@ std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
       for ( string::size_type spos, epos = 0;
           (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
             string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-            W2[row-256][col+1] = stod(token);
+            W2[row-257][col] = stod(token);
             col++;
           }
     // b2に格納
@@ -121,7 +121,7 @@ std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
       for ( string::size_type spos, epos = 0;
           (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
             string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-            b2.set(col,stod(token));
+            b2[col] = stod(token);
             col++;
           }
     // W3に格納
@@ -130,7 +130,7 @@ std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
       for ( string::size_type spos, epos = 0;
           (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
             string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-            W3[row-513][col+1] = stod(token);
+            W3[row-514][col] = stod(token);
             col++;
           }
     // b3に格納
@@ -139,7 +139,7 @@ std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
           for ( string::size_type spos, epos = 0;
               (spos = line.find_first_not_of(delim, epos)) != string::npos;) {
                 string token = line.substr(spos,(epos = line.find_first_of(delim, spos))-spos);
-                b3.set(col,stod(token));
+                b3[col] = stod(token);
                 col++;
           }
     }
@@ -151,11 +151,11 @@ std::tuple<Matrix,Matrix,Matrix,Vector,Vector,Vector> get_params(){
 
 Vector Backward(Vector p, Vector q){
   if(p.size() != q.size()) cerr << "err: vector size do not match." << endl;
-  
+
   Vector r(q.size());
   for(int i=0; i<q.size(); i++){
-    if(q.get(i)>0){r.set(i,p.get(i));}
-    else{r.set(i,0);}
+    if(q[i]>0){r[i] = p[i];}
+    else{r[i] = 0;}
   }
   return r;
 }
@@ -163,9 +163,9 @@ Vector Backward(Vector p, Vector q){
 Vector sign(Vector x){
   Vector r(x.size());
   for(int i=0; i<x.size(); i++){
-    if(x.get(i) > 0){r.set(i,1);}
-    else if(x.get(i) == 0){r.set(i,0);}
-    else{r.set(i,-1);}
+    if(x[i] > 0){r[i] = 1;}
+    else if(x[i] == 0){r[i] = 0;}
+    else{r[i] = -1;}
   }
   return r;
 }

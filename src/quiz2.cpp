@@ -21,8 +21,8 @@ int main(){
   // パラメータ取得
   Matrix W1,W2,W3;
   Vector b1(256),b2(256),b3(23);
-  tie(W1,W2,W3,b1,b2,b3) = get_params();
 
+  tie(W1,W2,W3,b1,b2,b3) = get_params();
   // ラベル取得
   Vector labels(154);
   labels = get_labels();
@@ -48,7 +48,7 @@ int main(){
     int pred = y.argmax()+1;
 
     // 正解ラベルとともに出力。正解していたらカウントを増やす。
-    int label = labels.get(i);
+    int label = labels[i];
     if(pred==label) num_correct++;
     cout << name_list[i] << ": \t" << pred << "\t" << label << "\t" << (pred==label) << endl;
   }
