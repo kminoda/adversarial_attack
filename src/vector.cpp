@@ -24,7 +24,7 @@ class Vector{
     int size();
 
     Vector operator+(const Vector& v);
-
+    
     void print();
 
     int argmax();

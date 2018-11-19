@@ -1,50 +1,38 @@
 #include <iostream>
 #include <cmath>
 
-#include "vector.cpp"
+class Vector{
 
-class Matrix{
-
-  int row;
-  int column;
-
+  int length;
   double** p_top;
 
   public:
-    Matrix(int i=1,int j=1);
-    Matrix(const Matrix &cp);
+    Vector(int i=1);
+    Vector(const Vector &cp);
 
-    ~Matrix();
+    ~Vector();
 
-    int row_size(){return(row);}
-    int column_size(){return(column);}
+    int size(){return(length);}
 
-    void change_size(int i,int j);
+    void change_size(int i);
     void print();
     double* &operator[](int i){return(p_top[i]);}
-    Matrix operator=(const Matrix &a);
-    Matrix operator+(const Matrix &a);
-    Matrix operator-(const Matrix &a);
-    Matrix operator*(const Matrix &a);
-    friend Matrix operator*(const Matrix &a, double b);
-    friend Matrix operator*(double b, const Matrix &a);
-
-    friend Vector operator*(const Matrix &a, Vector b);
-
-    void unit_matrix();
-    Matrix transpose();
+    Vector operator=(const Vector &a);
+    Vector operator+(const Vector &a);
+    Vector operator-(const Vector &a);
+    friend Vector operator*(const Vector &a, double b);
+    friend Vector operator*(double b, const Vector &a);
 };
 
 
-Matrix::Matrix(int i,int j)
+Matrix::Matrix(int i)
 {
-  if(i<1 || j<1){
-    std::cerr << "err Matrix::Matrix" << std::endl;
+  if(i<1){
+    std::cerr << "err Vector::Vector" << std::endl;
     exit(1);
   }
 
-  row = i ;
-  column = j;
+  length = i ;
 
   p_top = new double*[row+1];
   *p_top = new double[row*column+1];
